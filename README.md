@@ -1,3 +1,5 @@
+**Disclaimer:** This is a forked version of the Walktour library (see links below) to add additional features that the original library does not support. Ideally these features will be added to the library, at the moment we are waiting for a reply from the library creator.
+
 # walktour
  
 Guided tour/walkthrough component for react projects.

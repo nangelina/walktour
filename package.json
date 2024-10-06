@@ -1,5 +1,5 @@
 {
-  "name": "walktour",
+  "name": "@nangelina/walktour",
   "version": "5.2.0",
   "description": "Guided tour/walkthrough component for react",
   "type": "module",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alfrdmalr/walktour"
+    "url": "https://github.com/nangelina/walktour"
   },
   "license": "MIT",
   "peerDependencies": {
