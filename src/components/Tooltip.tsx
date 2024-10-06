@@ -2,7 +2,7 @@ import * as React from 'react';
 import { WalktourLogic } from './Walktour';
 import { WalktourStyles, defaultStyles } from '../defaultstyles';
 
-interface TooltipProps extends WalktourLogic {
+export interface TooltipProps extends WalktourLogic {
   styles?: WalktourStyles;
 }
 
@@ -43,49 +43,50 @@ export function Tooltip(props: TooltipProps) {
     <div style={tooltipStyle}>
       {customTitleRenderer
         ? customTitleRenderer(title, props)
-        : (title &&
-          <div style={styles.title}>
-            {title}
-          </div>
-        )
-      }
+        : title && <div style={styles.title}>{title}</div>}
 
-      {customDescriptionRenderer
-        ? customDescriptionRenderer(description, props)
-        : (
-          <div style={styles.description}>
-            {description}
-          </div>
-        )
-      }
+      {customDescriptionRenderer ? (
+        customDescriptionRenderer(description, props)
+      ) : (
+        <div style={styles.description}>{description}</div>
+      )}
 
-      {customFooterRenderer
-        ? customFooterRenderer(props)
-        : (
-          <div style={styles.footer}>
-            <button 
-            onClick={() => close()} 
-            style={{...styles.tertiaryButton, ...disableClose && styles.disabledButton}}
+      {customFooterRenderer ? (
+        customFooterRenderer(props)
+      ) : (
+        <div style={styles.footer}>
+          <button
+            onClick={() => close()}
+            style={{
+              ...styles.tertiaryButton,
+              ...(disableClose && styles.disabledButton),
+            }}
             disabled={disableClose}
-            >
-              {closeLabel || "close"}
-            </button>
-            <button
-              onClick={prev}
-              disabled={prevDisabled}
-              style={{...styles.secondaryButton, ...prevDisabled && styles.disabledButton}}
-            >
-              {prevLabel || "prev"}
-            </button>
-            <button
-              onClick={() => next()}
-              disabled={nextDisabled}
-              style={{...styles.primaryButton, ...nextDisabled && styles.disabledButton}}
-            >
-              {nextLabel || "next"}
-            </button>
-          </div>
-        )}
+          >
+            {closeLabel || 'close'}
+          </button>
+          <button
+            onClick={prev}
+            disabled={prevDisabled}
+            style={{
+              ...styles.secondaryButton,
+              ...(prevDisabled && styles.disabledButton),
+            }}
+          >
+            {prevLabel || 'prev'}
+          </button>
+          <button
+            onClick={() => next()}
+            disabled={nextDisabled}
+            style={{
+              ...styles.primaryButton,
+              ...(nextDisabled && styles.disabledButton),
+            }}
+          >
+            {nextLabel || 'next'}
+          </button>
+        </div>
+      )}
     </div>
-  )
+  );
 }
