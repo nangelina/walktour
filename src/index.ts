@@ -1,5 +1,5 @@
 import { Walktour } from './components/Walktour';
-import { Mask, MaskOptions } from './components/Mask';
+import { Mask, type MaskOptions } from './components/Mask';
 import type { Step, WalktourProps, WalktourOptions, WalktourLogic } from './components/Walktour';
 import { CardinalOrientation } from './utils/positioning';
 import type { Coords, Dims, ElementInfo } from './utils/dom';
