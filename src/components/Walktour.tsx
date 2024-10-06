@@ -9,7 +9,7 @@ import { centerViewportAroundElements } from '../utils/offset';
 import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll, setNextOnTargetClick } from '../utils/tour';
 
 export interface WalktourLogic {
-  next: (fromTarget?: boolean) => void;
+  next: (event?: MouseEvent) => void;
   prev: () => void;
   close: (reset?: boolean) => void;
   goToStep: (stepNumber: number) => void;
@@ -31,7 +31,7 @@ export interface WalktourOptions {
   customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
   customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
-  customNextFunc?: (tourLogic: WalktourLogic, fromTarget?: boolean) => void;
+  customNextFunc?: (tourLogic: WalktourLogic, event?: MouseEvent) => void;
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
   customCloseFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
@@ -50,7 +50,7 @@ export interface WalktourOptions {
   disableSmoothScroll?: boolean;
   allowForeignTarget?: boolean;
   nextOnTargetClick?: boolean;
-  validateNextOnTargetClick?: () => Promise<boolean>;
+  validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
 }
 
 export interface Step extends WalktourOptions {
@@ -158,7 +158,7 @@ export const Walktour = (props: WalktourProps) => {
     return cleanup;
   }, []);
 
-  // set/reset the tour root 
+  // set/reset the tour root
   React.useEffect(() => {
     let root: Element;
     if (rootSelector) {
@@ -197,7 +197,7 @@ export const Walktour = (props: WalktourProps) => {
       cleanup();
     }
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
-  
+
   // update tooltip and target position in state
   const updateTour = () => {
     cleanup();
@@ -218,7 +218,7 @@ export const Walktour = (props: WalktourProps) => {
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
     const currentTargetDims: Dims = getElementDims(currentTarget);
     const smartPadding: number = disableMask ? 0 : maskPadding;
-    
+
     const tooltipPosition: OrientationCoords = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
@@ -269,8 +269,8 @@ export const Walktour = (props: WalktourProps) => {
           allowForeignTarget,
           selector,
           getPositionFromCandidates,
-          orientationPreferences, 
-          padding: smartPadding, 
+          orientationPreferences,
+          padding: smartPadding,
           tooltipSeparation
         })) {
           updateTour();
@@ -325,9 +325,11 @@ export const Walktour = (props: WalktourProps) => {
 
   const tourLogic: WalktourLogic = {
     ...baseLogic,
-    ...customNextFunc && { next: (fromTarget?: boolean) => customNextFunc(baseLogic, fromTarget) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) },
-    ...customCloseFunc && { close: () => customCloseFunc(baseLogic) }
+    ...(customNextFunc && {
+      next: (event?: MouseEvent) => customNextFunc(baseLogic, event),
+    }),
+    ...(customPrevFunc && { prev: () => customPrevFunc(baseLogic) }),
+    ...(customCloseFunc && { close: () => customCloseFunc(baseLogic) }),
   };
 
   const keyPressHandler = (event: React.KeyboardEvent) => {

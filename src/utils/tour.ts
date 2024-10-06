@@ -177,7 +177,7 @@ export interface TooltipDesyncArgs extends GetTooltipPositionArgs {
  tooltipPosition: Coords;
 }
 
-// if there's no target, we need to ensure that the tooltip is centered, even if the window/container/scroll changes 
+// if there's no target, we need to ensure that the tooltip is centered, even if the window/container/scroll changes
 // if a target exists, there's not a tooltip desync in this context; there are two other functions
 // to determine if the tooltip/target are out of sync - this is solely for non-target cases
 export function tooltipDesync(args: TooltipDesyncArgs): boolean {
@@ -190,7 +190,7 @@ export function tooltipDesync(args: TooltipDesyncArgs): boolean {
 
   // if there's a difference between the newly calculated position and the current position, we need to update
   return dist(newPosition.coords, currentPosition) !== 0;
-  
+
 }
 
 export interface ShouldUpdateArgs extends TargetChangedArgs, ShouldScrollArgs, TooltipDesyncArgs { }
@@ -215,21 +215,29 @@ export const takeActionIfValid = async (action: () => void, actionValidator?: ()
   }
 }
 
-export const setNextOnTargetClick = (target: HTMLElement, next: (fromTarget?: boolean) => void, validateNext?: () => Promise<boolean>): (() => void) => {
+export const setNextOnTargetClick = (
+  target: HTMLElement,
+  next: (event?: MouseEvent) => void,
+  validateNext?: (event: MouseEvent) => Promise<boolean>
+): (() => void) => {
   if (!target) {
     return;
   }
 
   // if valid, call a handler which 1. calls the tetheredAction function and 2. removes itself from the target
-  const clickHandler = () => {
+  const clickHandler = (event: MouseEvent) => {
     const actionWithCleanup = () => {
-      next(true);
+      next(event);
       target.removeEventListener('click', clickHandler);
-    }
+    };
 
-    takeActionIfValid(actionWithCleanup, validateNext)
-  }
+    const actionWithMouseEvent = validateNext
+      ? async () => await validateNext(event)
+      : undefined;
+
+    takeActionIfValid(actionWithCleanup, actionWithMouseEvent);
+  };
 
   target.addEventListener('click', clickHandler);
   return () => target.removeEventListener('click', clickHandler); // return so we can remove the event elsewhere if the action doesn't get called
-}
+};
