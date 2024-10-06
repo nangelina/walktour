@@ -1,6 +1,6 @@
 {
   "name": "@nangelina/walktour",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Guided tour/walkthrough component for react",
   "type": "module",
   "source": "src/index.ts",
@@ -22,6 +22,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/nangelina/walktour"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "peerDependencies": {
