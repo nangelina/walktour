@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { WalktourLogic } from './Walktour';
+import { StepData, WalktourLogic } from './Walktour';
 import { WalktourStyles, defaultStyles } from '../defaultstyles';
 
-export interface TooltipProps extends WalktourLogic {
+export interface TooltipProps<Data extends StepData = never> extends WalktourLogic<Data> {
   styles?: WalktourStyles;
 }
 
-export function Tooltip(props: TooltipProps) {
+export function Tooltip<Data extends StepData = never>(props: TooltipProps<Data>) {
   const {
     next,
     prev,

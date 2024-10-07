@@ -8,18 +8,18 @@ import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll, setNextOnTargetClick } from '../utils/tour';
 
-export interface WalktourLogic {
+export interface WalktourLogic<Data extends StepData = never> {
   next: (event?: MouseEvent) => void;
   prev: () => void;
   close: (reset?: boolean) => void;
   goToStep: (stepNumber: number) => void;
-  stepContent: Step;
+  stepContent: Step<Data>;
   stepIndex: number;
-  allSteps: Step[];
+  allSteps: Step<Data>[];
   tooltipPosition: OrientationCoords;
 }
 
-export interface WalktourOptions {
+export interface WalktourOptions<Data extends StepData = never> {
   disableMaskInteraction?: boolean;
   disableCloseOnClick?: boolean;
   orientationPreferences?: CardinalOrientation[];
@@ -27,13 +27,13 @@ export interface WalktourOptions {
   maskRadius?: number;
   tooltipSeparation?: number;
   transition?: string;
-  customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
-  customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
-  customNextFunc?: (tourLogic: WalktourLogic, event?: MouseEvent) => void;
-  customPrevFunc?: (tourLogic: WalktourLogic) => void;
-  customCloseFunc?: (tourLogic: WalktourLogic) => void;
+  customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic<Data>) => JSX.Element;
+  customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic<Data>) => JSX.Element;
+  customFooterRenderer?: (tourLogic?: WalktourLogic<Data>) => JSX.Element;
+  customTooltipRenderer?: (tourLogic?: WalktourLogic<Data>) => JSX.Element;
+  customNextFunc?: (tourLogic: WalktourLogic<Data>, event?: MouseEvent) => void;
+  customPrevFunc?: (tourLogic: WalktourLogic<Data>) => void;
+  customCloseFunc?: (tourLogic: WalktourLogic<Data>) => void;
   prevLabel?: string;
   nextLabel?: string;
   closeLabel?: string;
@@ -55,14 +55,17 @@ export interface WalktourOptions {
   positionTooltipAsCloseToCenterAsPossible?: boolean;
 }
 
-export interface Step extends WalktourOptions {
+export type StepData = Record<string, unknown> | never;
+
+export interface Step<Data extends StepData = never> extends WalktourOptions<Data> {
   selector: string;
   title?: string;
   description: string;
+  data?: Data;
 }
 
-export interface WalktourProps extends WalktourOptions {
-  steps: Step[];
+export interface WalktourProps<Data extends StepData = never> extends WalktourOptions<Data> {
+  steps: Step<Data>[];
   initialStepIndex?: number;
   zIndex?: number;
   rootSelector?: string;
@@ -74,7 +77,7 @@ export interface WalktourProps extends WalktourOptions {
   debug?: boolean;
 }
 
-const walktourDefaultProps: Partial<WalktourProps> = {
+const walktourDefaultProps = {
   maskPadding: 5,
   maskRadius: 0,
   tooltipSeparation: 10,
@@ -84,13 +87,13 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   zIndex: 9999,
   renderTolerance: 2,
   updateInterval: 500
-}
+} satisfies Partial<WalktourProps>
 
 const basePortalString: string = 'walktour-portal';
 const baseMaskString: string = 'walktour-mask';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
-export const Walktour = (props: WalktourProps) => {
+export const Walktour = <Data extends StepData = never>(props: WalktourProps<Data>) => {
 
   const {
     steps,
@@ -111,10 +114,10 @@ export const Walktour = (props: WalktourProps) => {
   const targetPosition = React.useRef<Coords>(undefined);
   const targetSize = React.useRef<Dims>(undefined);
 
-  const currentStepContent: Step = steps[currentStepIndex];
+  const currentStepContent: Step<Data> = steps[currentStepIndex];
   const tourOpen: boolean = controlled ? isOpen : isOpenState;
 
-  const options: WalktourOptions & WalktourProps & Step = {
+  const options: WalktourOptions<Data> & WalktourProps<Data> & Step<Data> = {
     ...walktourDefaultProps,
     ...props,
     ...currentStepContent
@@ -316,7 +319,7 @@ export const Walktour = (props: WalktourProps) => {
     target && target.focus(); // return focus to last target when closed
   }
 
-  const baseLogic: WalktourLogic = {
+  const baseLogic: WalktourLogic<Data> = {
     next: () => goToStep(currentStepIndex + 1),
     prev: () => goToStep(currentStepIndex - 1),
     close: (reset?: boolean) => closeTour(reset),
@@ -327,7 +330,7 @@ export const Walktour = (props: WalktourProps) => {
     tooltipPosition
   };
 
-  const tourLogic: WalktourLogic = {
+  const tourLogic: WalktourLogic<Data> = {
     ...baseLogic,
     ...(customNextFunc && {
       next: (event?: MouseEvent) => customNextFunc(baseLogic, event),
@@ -431,4 +434,3 @@ export const Walktour = (props: WalktourProps) => {
     return render();
   }
 }
-
