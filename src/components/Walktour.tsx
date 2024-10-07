@@ -53,6 +53,7 @@ export interface WalktourOptions<Data extends StepData = never> {
   validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
   /** This is the default implementation by the original package. */
   positionTooltipAsCloseToCenterAsPossible?: boolean;
+  tooltipContainerStyle?: React.CSSProperties
 }
 
 export type StepData = Record<string, unknown> | never;
@@ -381,7 +382,8 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
     top: tooltipPosition?.coords?.y,
     left: tooltipPosition?.coords?.x,
     transition: transition,
-    pointerEvents: 'auto'
+    pointerEvents: 'auto',
+    ...props.tooltipContainerStyle
   }
 
   const MaskTag = renderMask ? renderMask : Mask;
