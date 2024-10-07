@@ -51,6 +51,8 @@ export interface WalktourOptions {
   allowForeignTarget?: boolean;
   nextOnTargetClick?: boolean;
   validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
+  /** This is the default implementation by the original package. */
+  positionTooltipAsCloseToCenterAsPossible?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -151,7 +153,8 @@ export const Walktour = (props: WalktourProps) => {
     allowForeignTarget,
     nextOnTargetClick,
     validateNextOnTargetClick,
-    renderMask
+    renderMask,
+    positionTooltipAsCloseToCenterAsPossible,
   } = options;
 
   React.useEffect(() => {
@@ -229,7 +232,8 @@ export const Walktour = (props: WalktourProps) => {
       getPositionFromCandidates,
       disableAutoScroll,
       allowForeignTarget,
-      selector
+      selector,
+      positionTooltipAsCloseToCenterAsPossible,
     });
 
     setTarget(currentTarget);
