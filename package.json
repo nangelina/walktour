@@ -1,6 +1,6 @@
 {
   "name": "@nangelina/walktour",
-  "version": "5.7.0",
+  "version": "5.7.1",
   "description": "Guided tour/walkthrough component for react",
   "type": "module",
   "source": "src/index.ts",
