@@ -1,6 +1,6 @@
 {
   "name": "@nangelina/walktour",
-  "version": "5.7.2",
+  "version": "5.8.0",
   "description": "Guided tour/walkthrough component for react",
   "type": "module",
   "source": "src/index.ts",
@@ -12,7 +12,7 @@
   "scripts": {
     "start": "parcel demo/index.html --open",
     "build-demo": "parcel build demo/index.html --out-dir docs --out-file demo.html --public-url /walktour/",
-    "build": "parcel build",
+    "build": "parcel build --no-cache",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -c .storybook -o docs",

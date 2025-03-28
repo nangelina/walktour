@@ -1,7 +1,7 @@
 
 import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin, isWithinAt, isForeignTarget } from "./dom";
 import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement, getCurrentScrollOffset } from "./offset";
-import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView, getViewportStart } from "./viewport";
+import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView, getViewportStart, getViewportEnd } from "./viewport";
 
 export enum CardinalOrientation {
   EAST = 'east',
@@ -161,12 +161,8 @@ function chooseBestTooltipPosition(
   if (preferredCandidates.length === 1) {
     //if there's only a single pref candidate, use that
     return preferredCandidates[0];
-  } else if (scrollDisabled) {
-    // if scrolling is disabled, there's not much we can do except use the naive center reducer
-    return preferredCandidates.reduce(getCenterReducer(root, tooltip, target, false), undefined);
   } else {
-    // scrolling is allowed, which means we have to figure out:
-    // 1. what candidates are valid positions (not out of the scrolling root's bounds)
+    // 1. what candidates are valid positions (not out of the scrolling root's bounds, or if scrolling disabled, not out of the viewport bounds)
     // 2. which positions are absolutely compatible (allow both target & tooltip to fit within the viewport at the same time)
     // 3. which positions are currently compatible (allow both target & tooltip to fit with the CURRENT viewport)
     // if positionTooltipAsCloseToCenterAsPossible
@@ -176,9 +172,10 @@ function chooseBestTooltipPosition(
     //    priority is 3 > 2 > 1 for the pool of positions from which the first specified orientation is chosen
 
     const viewportDims: Dims = getViewportDims(root);
-    const viewportScrollStart: Coords = getViewportScrollStart(root);
     const viewportCurrentStart: Coords = getViewportStart(root);
-    const viewportScrollEnd: Coords = getViewportScrollEnd(root);
+    const viewportCurrentEnd: Coords = getViewportEnd(root);
+    const viewportScrollStart: Coords = scrollDisabled ? viewportCurrentStart : getViewportScrollStart(root);
+    const viewportScrollEnd: Coords = scrollDisabled ? viewportCurrentEnd : getViewportScrollEnd(root);
     const tooltipDims: Dims = getElementDims(tooltip);
     const targetDims: Dims = getElementDims(target);
     const targetCoords: Coords = getElementCoords(target);
