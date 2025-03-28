@@ -53,7 +53,8 @@ export interface WalktourOptions<Data extends StepData = never> {
   validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
   /** This is the default implementation by the original package. */
   positionTooltipAsCloseToCenterAsPossible?: boolean;
-  tooltipContainerStyle?: React.CSSProperties
+  tooltipContainerStyle?: React.CSSProperties;
+  disableKeyboardFocus?: boolean;
 }
 
 export type StepData = Record<string, unknown> | never;
@@ -159,6 +160,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
     validateNextOnTargetClick,
     renderMask,
     positionTooltipAsCloseToCenterAsPossible,
+    disableKeyboardFocus,
   } = options;
 
   React.useEffect(() => {
@@ -415,7 +417,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
             id={getIdString(baseTooltipContainerString, identifier)}
             style={tooltipContainerStyle}
             onKeyDown={keyPressHandler}
-            tabIndex={0}
+            tabIndex={disableKeyboardFocus ? undefined : 0}
           >
             {customTooltipRenderer
               ? customTooltipRenderer(tourLogic)
