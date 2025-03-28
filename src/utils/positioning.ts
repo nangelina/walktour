@@ -36,7 +36,8 @@ export interface GetTooltipPositionArgs {
   allowForeignTarget?: boolean;
   selector?: string;
   /** This is the default implementation by the original package. */
-  positionTooltipAsCloseToCenterAsPossible?: boolean
+  positionTooltipAsCloseToCenterAsPossible?: boolean;
+  hideTooltipIfNoTarget?: boolean;
 }
 
 function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
@@ -285,8 +286,30 @@ function restrictToCurrentViewport(root: Element, coords: Coords, dims: Dims, pa
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): OrientationCoords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, root: tourRoot, disableAutoScroll: scrollDisabled, allowForeignTarget, selector, positionTooltipAsCloseToCenterAsPossible } = args;
-  const center: Coords = target ? getViewportCenter(tourRoot, tooltip, getScrolledViewportPosition(tourRoot, centerViewportAroundElement(tourRoot, target))) : getViewportCenter(tourRoot, tooltip)
+  const {
+    target,
+    tooltip,
+    padding,
+    tooltipSeparation,
+    orientationPreferences,
+    getPositionFromCandidates,
+    root: tourRoot,
+    disableAutoScroll: scrollDisabled,
+    allowForeignTarget,
+    selector,
+    positionTooltipAsCloseToCenterAsPossible,
+    hideTooltipIfNoTarget,
+  } = args;
+  const center: Coords = target
+    ? getViewportCenter(
+        tourRoot,
+        tooltip,
+        getScrolledViewportPosition(
+          tourRoot,
+          centerViewportAroundElement(tourRoot, target)
+        )
+      )
+    : getViewportCenter(tourRoot, tooltip);
   const defaultPosition: Coords = addAppropriateOffset(tourRoot, center);
 
   if (!tooltip || !tourRoot) {
@@ -294,7 +317,11 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): OrientationCoo
   }
 
   if (!target) {
-    return {orientation: null, coords: defaultPosition};
+    if (hideTooltipIfNoTarget) {
+      return;
+    }
+
+    return { orientation: null, coords: defaultPosition };
   }
 
   const foreignTarget: boolean = allowForeignTarget && isForeignTarget(tourRoot, selector);

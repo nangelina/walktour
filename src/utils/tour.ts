@@ -181,8 +181,14 @@ export interface TooltipDesyncArgs extends GetTooltipPositionArgs {
 // if a target exists, there's not a tooltip desync in this context; there are two other functions
 // to determine if the tooltip/target are out of sync - this is solely for non-target cases
 export function tooltipDesync(args: TooltipDesyncArgs): boolean {
-  const { target, root, tooltip, tooltipPosition: currentPosition } = args;
-  if (target || !root || !tooltip) {
+  const {
+    target,
+    root,
+    tooltip,
+    tooltipPosition: currentPosition,
+    hideTooltipIfNoTarget,
+  } = args;
+  if (target || hideTooltipIfNoTarget || !root || !tooltip) {
     return false;
   }
 

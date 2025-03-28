@@ -53,6 +53,7 @@ export interface WalktourOptions<Data extends StepData = never> {
   validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
   /** This is the default implementation by the original package. */
   positionTooltipAsCloseToCenterAsPossible?: boolean;
+  hideTooltipIfNoTarget?: boolean;
   tooltipContainerStyle?: React.CSSProperties
 }
 
@@ -159,6 +160,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
     validateNextOnTargetClick,
     renderMask,
     positionTooltipAsCloseToCenterAsPossible,
+    hideTooltipIfNoTarget
   } = options;
 
   React.useEffect(() => {
@@ -226,7 +228,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
     const currentTargetDims: Dims = getElementDims(currentTarget);
     const smartPadding: number = disableMask ? 0 : maskPadding;
 
-    const tooltipPosition: OrientationCoords = getTooltipPosition({
+    const tooltipPosition: OrientationCoords | undefined = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
       padding: smartPadding,
@@ -238,6 +240,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
       allowForeignTarget,
       selector,
       positionTooltipAsCloseToCenterAsPossible,
+      hideTooltipIfNoTarget
     });
 
     setTarget(currentTarget);
@@ -256,7 +259,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
       root,
       target: currentTarget,
       tooltip: tooltipContainer,
-      tooltipPosition: tooltipPosition.coords
+      tooltipPosition: tooltipPosition?.coords
     })) {
       scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition.coords, currentTargetPosition), disableSmoothScroll)
     }
@@ -279,7 +282,8 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
           getPositionFromCandidates,
           orientationPreferences,
           padding: smartPadding,
-          tooltipSeparation
+          tooltipSeparation,
+          hideTooltipIfNoTarget,
         })) {
           updateTour();
         }
@@ -289,7 +293,7 @@ export const Walktour = <Data extends StepData = never>(props: WalktourProps<Dat
       cleanupRefs.current.push(cleanupUpdateListener)
 
       // if the user requests a watcher and there's supposed to be a target
-      if (movingTarget && (currentTarget || selector)) {
+      if (movingTarget && (currentTarget || hideTooltipIfNoTarget || selector)) {
         const cleanupWatcher = setTargetWatcher(conditionalUpdate, updateInterval)
         cleanupRefs.current.push(cleanupWatcher);
       }
