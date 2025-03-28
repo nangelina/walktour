@@ -242,8 +242,7 @@ function getPreferredCandidates(candidates: OrientationCoords[], orientationPref
       return candidates; // if the specified orientation isn't available for whatever reason, default to standard behavior
     }
   } else {
-    const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-    return candidates.filter(preferenceFilter);
+    return orientationPreferences.map((orientation) => candidates.find((oc: OrientationCoords) => oc.orientation === orientation));
   }
 }
 
